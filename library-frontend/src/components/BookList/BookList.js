@@ -131,31 +131,30 @@ const BookList = () => {
               </thead>
               <tbody>
                 ${grievances
-                  .map(
-                    (grievance, index) => `
+        .map(
+          (grievance, index) => `
                   <tr>
                     <td>${(index + 1 + offset)
-                      .toString()
-                      .padStart(2, "0")} </td>
+              .toString()
+              .padStart(2, "0")} </td>
                     <td>${grievance.inwardNo}</td>
                     <td>${grievance.subject}</td>
                     <td>${grievance.fullName}</td>
                     <td>${grievance.handledBy}</td>
                     <td>${grievance.complaintSentTo}</td>
                     <td>${new Date(grievance.date)
-                      .toLocaleDateString("en-GB", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })
-                      .replace(/ /g, ", ")}</td>
-                    <td><span class="badge bg-danger">${
-                      grievance.applicationStatus
-                    }</span></td>
+              .toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })
+              .replace(/ /g, ", ")}</td>
+                    <td><span class="badge bg-danger">${grievance.applicationStatus
+            }</span></td>
                   </tr>
                 `
-                  )
-                  .join("")}
+        )
+        .join("")}
               </tbody>
             </table>
           </body>
@@ -176,10 +175,8 @@ const BookList = () => {
     const dataStr = grievances
       .map(
         (grievance, index) =>
-          `${(index + 1 + offset).toString().padStart(2, "0")}\t${
-            grievance.inwardNo
-          }\t${grievance.subject}\t${grievance.fullName}\t${
-            grievance.handledBy
+          `${(index + 1 + offset).toString().padStart(2, "0")}\t${grievance.inwardNo
+          }\t${grievance.subject}\t${grievance.fullName}\t${grievance.handledBy
           }\t${grievance.complaintSentTo}\t${new Date(grievance.date)
             .toLocaleDateString("en-GB", {
               day: "2-digit",
@@ -211,8 +208,7 @@ const BookList = () => {
       grievances
         .map(
           (grievance) =>
-            `${grievance.inwardNo},${grievance.subject},${grievance.fullName},${
-              grievance.handledBy
+            `${grievance.inwardNo},${grievance.subject},${grievance.fullName},${grievance.handledBy
             },${grievance.complaintSentTo},${new Date(grievance.date)
               .toLocaleDateString("en-GB", {
                 day: "2-digit",
@@ -345,7 +341,7 @@ const BookList = () => {
             <div>
               <nav>
                 <ol className="breadcrumb mb-1">
-                  <li className="breadcrumb-item fw-semibold">
+                  <li className="breadcrumb-item">
                     <Link to="/dashboard">Home</Link>
                   </li>
                   <div
@@ -358,7 +354,7 @@ const BookList = () => {
                   >
                     <HiOutlineArrowNarrowRight className="mx-2 mt-1" />
                   </div>
-                  <li className="breadcrumb-item active fw-bold" aria-current="page">
+                  <li className="breadcrumb-item active" aria-current="page">
                     Manage Books
                   </li>
                 </ol>
@@ -599,7 +595,7 @@ const BookList = () => {
                                 justifyContent: "space-between",
                                 background: "#f2f4f7",
                                 fontWeight: "bold"
-                                
+
                               }}
                               className="text-center"
                             >
@@ -663,16 +659,15 @@ const BookList = () => {
                             displayedGrievances.map((grievance, index) => (
                               <tr
                                 key={grievance.id}
-                                className={`table-${
-                                  grievance.applicationStatus === "Completed"
+                                className={`table-${grievance.applicationStatus === "Completed"
                                     ? "success"
                                     : grievance.applicationStatus === "Rejected"
-                                    ? "danger"
-                                    : grievance.applicationStatus ===
-                                      "In Progress"
-                                    ? "warning"
-                                    : ""
-                                }`}
+                                      ? "danger"
+                                      : grievance.applicationStatus ===
+                                        "In Progress"
+                                        ? "warning"
+                                        : ""
+                                  }`}
                               >
                                 <td>
                                   {(index + 1 + offset)
@@ -731,21 +726,20 @@ const BookList = () => {
                                 </td>
                                 <td>
                                   <span
-                                    className={`badge bg-${
-                                      grievance.applicationStatus ===
-                                      "Completed"
+                                    className={`badge bg-${grievance.applicationStatus ===
+                                        "Completed"
                                         ? "success"
                                         : grievance.applicationStatus ===
                                           "Rejected"
-                                        ? "danger"
-                                        : grievance.applicationStatus ===
-                                          "In Progress"
-                                        ? "warning"
-                                        : grievance.applicationStatus ===
-                                          "Processed"
-                                        ? "info-transparent"
-                                        : ""
-                                    }`}
+                                          ? "danger"
+                                          : grievance.applicationStatus ===
+                                            "In Progress"
+                                            ? "warning"
+                                            : grievance.applicationStatus ===
+                                              "Processed"
+                                              ? "info-transparent"
+                                              : ""
+                                      }`}
                                   >
                                     {grievance.applicationStatus}
                                   </span>

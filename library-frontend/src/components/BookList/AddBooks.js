@@ -8,6 +8,7 @@ import "flatpickr/dist/flatpickr.css";
 import "./AddBooks.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { BookOpenText, Info, Star } from "lucide-react";
 
 const AddBooks = () => {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ const AddBooks = () => {
     moral: "",
   });
 
-  const [Error, setError] = useState({
+  const [errors, setErrors] = useState({
     title: "",
     author: "",
     isbn: "",
@@ -54,8 +55,21 @@ const AddBooks = () => {
     moral: "",
   });
 
+  const generateBookId = () => {
+    const now = new Date();
+    const year = now.getFullYear().toString().slice(-2);
+    const month = (now.getMonth() + 1).toString().padStart(2, "0");
+    const day = now.getDate().toString().padStart(2, "0");
+    const random = Math.floor(100 + Math.random() * 900);
+    return `BK${year}${month}${day}${random}`;
+  };
+
+  useEffect(() => {
+    setFormData(prev => ({ ...prev, id: generateBookId() }));
+  }, []);
+
   const validateForm = () => {
-    const newError = {
+    const newErrors = {
       title: "",
       author: "",
       isbn: "",
@@ -81,128 +95,59 @@ const AddBooks = () => {
     const requiredFields = [
       "title",
       "author",
-      "isbn",
-      "publisher",
       "category",
       "language",
-      "availableCopies",
       "totalCopies",
       "floor",
-      "shelfCode",
       "status",
       "totalPages",
       "features",
-      "volume",
-      "createdDate",
-      "publishedYear",
-      "publishedDate",
-      "moral",
+      "moral"
     ];
 
     requiredFields.forEach((field) => {
       if (!formData[field]?.toString().trim()) {
-        newError[field] = `*${field.replace(/([A-Z])/g, " $1")} is required`;
+        newErrors[field] = `${field.replace(/([A-Z])/g, " $1")} is required`;
         isValid = false;
       }
     });
 
-    // Specific field pattern validations
     if (formData.isbn && !/^[\d-]{10,13}$/.test(formData.isbn)) {
-      newError.isbn = "*ISBN should be 10 to 13 digits or include hyphens";
+      newErrors.isbn = "ISBN should be 10 to 13 digits or include hyphens";
       isValid = false;
     }
 
     if (formData.availableCopies && isNaN(formData.availableCopies)) {
-      newError.availableCopies = "*Available copies must be a number";
+      newErrors.availableCopies = "Available copies must be a number";
       isValid = false;
     }
 
     if (formData.totalCopies && isNaN(formData.totalCopies)) {
-      newError.totalCopies = "*Total copies must be a number";
+      newErrors.totalCopies = "Total copies must be a number";
       isValid = false;
     }
 
     if (formData.totalPages && isNaN(formData.totalPages)) {
-      newError.totalPages = "*Total pages must be a number";
+      newErrors.totalPages = "Total pages must be a number";
       isValid = false;
     }
 
     if (formData.volume && isNaN(formData.volume)) {
-      newError.volume = "*Volume must be a number";
+      newErrors.volume = "Volume must be a number";
       isValid = false;
     }
 
-    setError(newError);
+    setErrors(newErrors);
     return isValid;
-  };
-
-  const handleFocus = (field) => {
-    setError((prevError) => ({ ...prevError, [field]: "" }));
-  };
-
-  const generateBookId = () => {
-    const now = new Date();
-    const year = now.getFullYear().toString().slice(-2); // Last 2 digits of year
-    const month = (now.getMonth() + 1).toString().padStart(2, "0"); // Month with leading zero
-    const day = now.getDate().toString().padStart(2, "0"); // Day with leading zero
-    const random = Math.floor(100 + Math.random() * 900); // Random 3-digit number
-    return `STU${year}${month}${day}${random}`;
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    let newError = {};
+    setFormData(prev => ({ ...prev, [name]: value }));
 
-    const alphaRegex = /^[A-Za-z\s]*$/;
-
-    if (name === "inwardNo") {
-      setFormData({ ...formData, [name]: value });
-
-      if (value.trim() !== "") {
-        newError[name] = "";
-      } else {
-        newError[name] = "*Inward number cannot be empty";
-      }
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: "" }));
     }
-    if (name === "date") {
-      const dateValue = new Date(value);
-      if (!isNaN(dateValue.getTime())) {
-        setFormData({ ...formData, [name]: value });
-      }
-    }
-
-    if (
-      name === "fullName" ||
-      name === "subject" ||
-      name === "handledBy" ||
-      name === "complaintSentTo" ||
-      name === "district" ||
-      name === "taluka" ||
-      name === "village" ||
-      name === "city" ||
-      name === "whatsappGroup" ||
-      name === "applicationStatus" ||
-      name === "remark"
-    ) {
-      if (alphaRegex.test(value) || value === "") {
-        setFormData({ ...formData, [name]: value });
-        newError[name] = "";
-      } else {
-        newError[name] = `*Only alphabets are allowed for ${name}`;
-      }
-    } else if (
-      name === "mobileNo" ||
-      name === "pincode" ||
-      name === "boothNo"
-    ) {
-      if (/^[0-9]*$/.test(value) || value === "") {
-        setFormData({ ...formData, [name]: value });
-        newError[name] = "";
-      } else {
-        newError[name] = `*Only numbers are allowed for ${name}`;
-      }
-    }
-    setError((prevError) => ({ ...prevError, ...newError }));
   };
 
   const handleSubmit = async (e) => {
@@ -212,16 +157,11 @@ const AddBooks = () => {
       return;
     }
 
-    if (!formData.date) {
-      formData.date = new Date().toISOString().split("T")[0];
-    }
-
     try {
-      // eslint-disable-next-line
-      const response = await api.post("/grievances", formData);
+      const response = await api.post("/books", formData);
       const notificationData = {
-        heading: "Added New Entry",
-        description: `Added new grievance ${formData.inwardNo}`,
+        heading: "Added New Book",
+        description: `Added new book ${formData.title}`,
         readed: 0,
       };
 
@@ -250,29 +190,28 @@ const AddBooks = () => {
         moral: "",
       });
     } catch (error) {
-      console.error("Error adding grievances:", error);
-      alert("Error adding grievance, please try again.");
+      console.error("Error adding book:", error);
+      alert("Error adding book, please try again.");
     }
   };
 
-  const [selectedDate, setSelectedDate] = useState(null);
   return (
     <>
-      <div class="main-content app-content">
-        <div class="container-fluid">
-          <div class="d-flex align-items-center justify-content-between page-header-breadcrumb flex-wrap gap-2">
+      <div className="main-content app-content">
+        <div className="container-fluid">
+          <div className="d-flex align-items-center justify-content-between page-header-breadcrumb flex-wrap gap-2">
             <div>
               <nav>
-                <ol class="breadcrumb mb-1">
-                  <li class="breadcrumb-item fw-semibold">
+                <ol className="breadcrumb mb-1">
+                  <li className="breadcrumb-item">
                     <Link to="/dashboard">Home</Link>
                   </li>
                   <HiOutlineArrowNarrowRight className="mx-2 align-self-center" />
-                  <li class="breadcrumb-item fw-semibold">
+                  <li className="breadcrumb-item">
                     <Link to="/books">Manage Books</Link>
                   </li>
                   <HiOutlineArrowNarrowRight className="mx-2 align-self-center" />
-                  <li class="breadcrumb-item active fw-bold" aria-current="page">
+                  <li className="breadcrumb-item active" aria-current="page">
                     Add Book
                   </li>
                 </ol>
@@ -280,27 +219,25 @@ const AddBooks = () => {
             </div>
           </div>
 
-          <div class="row">
-            <div class="col-xl-12">
+          <div className="row">
+            <div className="col-xl-12">
               <div className="card custom-card">
                 <div
                   className="card-header justify-content-between d-flex align-items-center"
                   style={{
-                    // background: 'linear-gradient(to right, #6a11cb, #2575fc)',
                     background: 'linear-gradient(to right, #6a5af9 0%, #a034f8 100%)',
                     color: 'white',
                     fontSize: '14px',
                     fontWeight: '500',
-                    padding: '15px',
-                    borderRadius: '10px 10px 0 0', // Rounded top corners
+                    padding: '10px',
+                    borderRadius: '10px 10px 0 0',
                   }}
                 >
                   <div className="d-flex align-items-center">
-                    {/* Circle Box for the SVG Icon with Transparency */}
                     <div
                       style={{
-                        backgroundColor: 'rgba(255, 255, 255, 0.1)', // Transparent white background with 10% opacity
-                        borderRadius: '50%', // Circle shape
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        borderRadius: '50%',
                         padding: '10px',
                         marginRight: '15px',
                         display: 'flex',
@@ -308,28 +245,8 @@ const AddBooks = () => {
                         alignItems: 'center',
                       }}
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="25"
-                        height="25"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="lucide lucide-book-open-text text-white"
-                      >
-                        <path d="M12 7v14"></path>
-                        <path d="M16 12h2"></path>
-                        <path d="M16 8h2"></path>
-                        <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path>
-                        <path d="M6 12h2"></path>
-                        <path d="M6 8h2"></path>
-                      </svg>
+                      <BookOpenText size={25} className="text-white" />
                     </div>
-
-                    {/* Title and Message */}
                     <div>
                       <div className="card-title fw-bold fs-6">Add New Book</div>
                       <div className="d-flex align-items-center" style={{ fontSize: '12px', fontWeight: '400', color: "oklch(0.93 0.034 272.788)" }}>
@@ -337,34 +254,33 @@ const AddBooks = () => {
                       </div>
                     </div>
                   </div>
-
-                  {/* Optional Prism Toggle */}
                   <div className="prism-toggle"></div>
                 </div>
 
-                <div class="card-body">
+                <div className="card-body">
                   <form onSubmit={handleSubmit} autoComplete="off">
                     <div className="row gy-3">
-
+                      {/* Book Information Section */}
                       <div className="col-12 mt-4">
                         <div className="p-4" style={{ backgroundColor: '#e6f2ff', borderRadius: '8px' }}>
                           <div className="row gy-3">
                             <div className="col-12 d-flex align-items-center gap-2">
                               <span
                                 style={{
-                                  backgroundColor: "#fff", // light bluish background
+                                  backgroundColor: "#fff",
                                   padding: "6px 10px",
-                                  borderRadius: "8px", // slightly rounded corners
+                                  borderRadius: "8px",
                                   display: "inline-block",
                                   fontSize: "16px",
                                 }}
                               >
-                                📚
+                                <Info size={20} className="text-indigo-500" />
                               </span>
                               <h6 className="fw-semibold mb-0" style={{ color: "#344054" }}>
                                 BOOK INFORMATION
                               </h6>
                             </div>
+
                             <div className="col-md-4">
                               <div className="p-3 rounded shadow" style={{ backgroundColor: "#fff" }}>
                                 <label className="form-label">Book ID</label>
@@ -374,36 +290,40 @@ const AddBooks = () => {
                                   name="id"
                                   value={formData.id}
                                   onChange={handleChange}
-                                  placeholder="Enter Book ID"
+                                  readOnly
                                 />
                               </div>
                             </div>
 
                             <div className="col-md-4">
                               <div className="p-3 rounded shadow" style={{ backgroundColor: "#fff" }}>
-                                <label className="form-label">Title</label>
+                                <label className="form-label">Title <span className="text-danger">*</span></label>
                                 <input
                                   type="text"
-                                  className="form-control"
+                                  className={`form-control ${errors.title ? 'is-invalid' : ''}`}
                                   name="title"
                                   value={formData.title}
                                   onChange={handleChange}
                                   placeholder="Enter Book Title"
+                                  required
                                 />
+                                {errors.title && <div className="invalid-feedback">{errors.title}</div>}
                               </div>
                             </div>
 
                             <div className="col-md-4">
                               <div className="p-3 rounded shadow" style={{ backgroundColor: "#fff" }}>
-                                <label className="form-label">Author</label>
+                                <label className="form-label">Author <span className="text-danger">*</span></label>
                                 <input
                                   type="text"
-                                  className="form-control"
+                                  className={`form-control ${errors.author ? 'is-invalid' : ''}`}
                                   name="author"
                                   value={formData.author}
                                   onChange={handleChange}
                                   placeholder="Enter Author Name"
+                                  required
                                 />
+                                {errors.author && <div className="invalid-feedback">{errors.author}</div>}
                               </div>
                             </div>
 
@@ -412,12 +332,13 @@ const AddBooks = () => {
                                 <label className="form-label">ISBN</label>
                                 <input
                                   type="text"
-                                  className="form-control"
+                                  className={`form-control ${errors.isbn ? 'is-invalid' : ''}`}
                                   name="isbn"
                                   value={formData.isbn}
                                   onChange={handleChange}
                                   placeholder="Enter ISBN"
                                 />
+                                {errors.isbn && <div className="invalid-feedback">{errors.isbn}</div>}
                               </div>
                             </div>
 
@@ -426,68 +347,61 @@ const AddBooks = () => {
                                 <label className="form-label">Publisher</label>
                                 <input
                                   type="text"
-                                  className="form-control"
+                                  className={`form-control ${errors.publisher ? 'is-invalid' : ''}`}
                                   name="publisher"
                                   value={formData.publisher}
                                   onChange={handleChange}
                                   placeholder="Enter Publisher"
                                 />
+                                {errors.publisher && <div className="invalid-feedback">{errors.publisher}</div>}
                               </div>
                             </div>
 
                             <div className="col-md-4">
                               <div className="p-3 rounded shadow" style={{ backgroundColor: "#fff" }}>
-                                <label className="form-label">Category</label>
-                                <input
-                                  type="text"
-                                  className="form-control"
+                                <label className="form-label">
+                                  Category <span className="text-danger">*</span>
+                                </label>
+                                <select
+                                  className={`form-select ${errors.category ? 'is-invalid' : ''}`}
                                   name="category"
                                   value={formData.category}
                                   onChange={handleChange}
-                                  placeholder="Enter Category"
-                                />
+                                  required
+                                >
+                                  <option value="">Select Category</option>
+                                  <option value="Fiction">Fiction</option>
+                                  <option value="Non-fiction">Non-fiction</option>
+                                  <option value="Biography">Biography</option>
+                                  <option value="History">History</option>
+                                  <option value="Science">Science</option>
+                                  <option value="Comics">Comics</option>
+                                </select>
+                                {errors.category && (
+                                  <div className="invalid-feedback">{errors.category}</div>
+                                )}
                               </div>
                             </div>
 
+
                             <div className="col-md-4">
-                              <div className="p-3 rounded shadow" style={{ backgroundColor: "#fff" }}>
-                                <label className="form-label">Language</label>
-                                <input
-                                  type="text"
-                                  className="form-control"
+                              <div className="p-3 rounded shadow bg-white">
+                                <label className="form-label">Language <span className="text-danger">*</span></label>
+                                <select
+                                  className={`form-select ${errors.language ? 'is-invalid' : ''}`}
                                   name="language"
                                   value={formData.language}
                                   onChange={handleChange}
-                                  placeholder="Enter Language"
-                                />
-                              </div>
-                            </div>
-
-                            <div className="col-md-4">
-                              <div className="p-3 rounded shadow" style={{ backgroundColor: "#fff" }}>
-                                <label className="form-label">Status</label>
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  name="status"
-                                  value={formData.status}
-                                  onChange={handleChange}
-                                  placeholder="Enter Status"
-                                />
-                              </div>
-                            </div>
-
-                            <div className="col-md-4">
-                              <div className="p-3 rounded shadow" style={{ backgroundColor: "#fff" }}>
-                                <label className="form-label">Total Pages</label>
-                                <input
-                                  type="number"
-                                  className="form-control"
-                                  name="totalPages"
-                                  value={formData.totalPages}
-                                  onChange={handleChange}
-                                  placeholder="Enter Total Pages"
-                                />
+                                  required
+                                >
+                                  <option value="">Select Language</option>
+                                  <option value="English">English</option>
+                                  <option value="Marathi">Marathi</option>
+                                  <option value="Hindi">Hindi</option>
+                                  <option value="French">French</option>
+                                  <option value="Spanish">Spanish</option>
+                                </select>
+                                {errors.language && <div className="invalid-feedback">{errors.language}</div>}
                               </div>
                             </div>
 
@@ -496,40 +410,45 @@ const AddBooks = () => {
                                 <label className="form-label">Available Copies</label>
                                 <input
                                   type="number"
-                                  className="form-control"
+                                  className={`form-control ${errors.availableCopies ? 'is-invalid' : ''}`}
                                   name="availableCopies"
                                   value={formData.availableCopies}
                                   onChange={handleChange}
                                   placeholder="Enter Available Copies"
                                 />
+                                {errors.availableCopies && <div className="invalid-feedback">{errors.availableCopies}</div>}
                               </div>
                             </div>
 
                             <div className="col-md-4">
                               <div className="p-3 rounded shadow" style={{ backgroundColor: "#fff" }}>
-                                <label className="form-label">Total Copies</label>
+                                <label className="form-label">Total Copies <span className="text-danger">*</span></label>
                                 <input
                                   type="number"
-                                  className="form-control"
+                                  className={`form-control ${errors.totalCopies ? 'is-invalid' : ''}`}
                                   name="totalCopies"
                                   value={formData.totalCopies}
                                   onChange={handleChange}
                                   placeholder="Enter Total Copies"
+                                  required
                                 />
+                                {errors.totalCopies && <div className="invalid-feedback">{errors.totalCopies}</div>}
                               </div>
                             </div>
 
                             <div className="col-md-4">
                               <div className="p-3 rounded shadow" style={{ backgroundColor: "#fff" }}>
-                                <label className="form-label">Floor</label>
+                                <label className="form-label">Floor <span className="text-danger">*</span></label>
                                 <input
                                   type="text"
-                                  className="form-control"
+                                  className={`form-control ${errors.floor ? 'is-invalid' : ''}`}
                                   name="floor"
                                   value={formData.floor}
                                   onChange={handleChange}
                                   placeholder="Enter Floor"
+                                  required
                                 />
+                                {errors.floor && <div className="invalid-feedback">{errors.floor}</div>}
                               </div>
                             </div>
 
@@ -538,11 +457,57 @@ const AddBooks = () => {
                                 <label className="form-label">Shelf Code</label>
                                 <input
                                   type="text"
-                                  className="form-control"
+                                  className={`form-control ${errors.shelfCode ? 'is-invalid' : ''}`}
                                   name="shelfCode"
                                   value={formData.shelfCode}
                                   onChange={handleChange}
                                   placeholder="Enter Shelf Code"
+                                />
+                                {errors.shelfCode && <div className="invalid-feedback">{errors.shelfCode}</div>}
+                              </div>
+                            </div>
+
+                            <div className="col-md-4">
+                              <div className="p-3 rounded shadow" style={{ backgroundColor: "#fff" }}>
+                                <label className="form-label">Status <span className="text-danger">*</span></label>
+                                <select
+                                  className={`form-select ${errors.status ? 'is-invalid' : ''}`}
+                                  name="status"
+                                  value={formData.status}
+                                  onChange={handleChange}
+                                  required
+                                >
+                                  <option value="">Select Status</option>
+                                  <option value="Available">Available</option>
+                                  <option value="Reserved">Reserved</option>
+                                  <option value="Out of Stock">Out of Stock</option>
+                                </select>
+                                {errors.status && <div className="invalid-feedback">{errors.status}</div>}
+                              </div>
+                            </div>
+
+                            <div className="col-md-4">
+                              <div className="p-3 rounded shadow" style={{ backgroundColor: "#fff" }}>
+                                <label className="form-label">Total Pages <span className="text-danger">*</span></label>
+                                <input
+                                  type="number"
+                                  className={`form-control ${errors.totalPages ? 'is-invalid' : ''}`}
+                                  name="totalPages"
+                                  value={formData.totalPages}
+                                  onChange={handleChange}
+                                  placeholder="Enter Total Pages"
+                                  required
+                                />
+                                {errors.totalPages && <div className="invalid-feedback">{errors.totalPages}</div>}
+                              </div>
+                            </div>
+
+                            <div className="col-md-4">
+                              <div className="p-3 rounded shadow" style={{ backgroundColor: "#fff" }}>
+                                <label className="form-label">File Attachment</label>
+                                <input
+                                  type="file"
+                                  className="form-control"
                                 />
                               </div>
                             </div>
@@ -550,21 +515,21 @@ const AddBooks = () => {
                         </div>
                       </div>
 
-                      {/* --- Features Information Section --- */}
+                      {/* Features Information Section */}
                       <div className="col-12 mt-4">
                         <div className="p-4" style={{ backgroundColor: '#fff0f3', borderRadius: '8px' }}>
                           <div className="row gy-3">
                             <div className="col-12 d-flex align-items-center gap-2">
                               <span
                                 style={{
-                                  backgroundColor: "#fff", // light bluish background
+                                  backgroundColor: "#fff",
                                   padding: "6px 10px",
-                                  borderRadius: "8px", // slightly rounded corners
+                                  borderRadius: "8px",
                                   display: "inline-block",
                                   fontSize: "16px",
                                 }}
                               >
-                                ✨
+                                <Star size={20} className="text-pink-500" />
                               </span>
                               <h6 className="fw-semibold mb-0" style={{ color: "#344054" }}>
                                 FEATURES INFORMATION
@@ -573,15 +538,17 @@ const AddBooks = () => {
 
                             <div className="col-md-4">
                               <div className="p-3 rounded shadow" style={{ backgroundColor: "#fff" }}>
-                                <label className="form-label">Features</label>
+                                <label className="form-label">Features <span className="text-danger">*</span></label>
                                 <input
                                   type="text"
-                                  className="form-control"
+                                  className={`form-control ${errors.features ? 'is-invalid' : ''}`}
                                   name="features"
                                   value={formData.features}
                                   onChange={handleChange}
                                   placeholder="Enter Features"
+                                  required
                                 />
+                                {errors.features && <div className="invalid-feedback">{errors.features}</div>}
                               </div>
                             </div>
 
@@ -590,12 +557,13 @@ const AddBooks = () => {
                                 <label className="form-label">Volume</label>
                                 <input
                                   type="text"
-                                  className="form-control"
+                                  className={`form-control ${errors.volume ? 'is-invalid' : ''}`}
                                   name="volume"
                                   value={formData.volume}
                                   onChange={handleChange}
                                   placeholder="Enter Volume"
                                 />
+                                {errors.volume && <div className="invalid-feedback">{errors.volume}</div>}
                               </div>
                             </div>
 
@@ -604,11 +572,12 @@ const AddBooks = () => {
                                 <label className="form-label">Created Date</label>
                                 <input
                                   type="date"
-                                  className="form-control"
+                                  className={`form-control ${errors.createdDate ? 'is-invalid' : ''}`}
                                   name="createdDate"
                                   value={formData.createdDate}
                                   onChange={handleChange}
                                 />
+                                {errors.createdDate && <div className="invalid-feedback">{errors.createdDate}</div>}
                               </div>
                             </div>
 
@@ -617,12 +586,13 @@ const AddBooks = () => {
                                 <label className="form-label">Published Year</label>
                                 <input
                                   type="text"
-                                  className="form-control"
+                                  className={`form-control ${errors.publishedYear ? 'is-invalid' : ''}`}
                                   name="publishedYear"
                                   value={formData.publishedYear}
                                   onChange={handleChange}
                                   placeholder="Enter Published Year"
                                 />
+                                {errors.publishedYear && <div className="invalid-feedback">{errors.publishedYear}</div>}
                               </div>
                             </div>
 
@@ -631,25 +601,28 @@ const AddBooks = () => {
                                 <label className="form-label">Published Date</label>
                                 <input
                                   type="date"
-                                  className="form-control"
+                                  className={`form-control ${errors.publishedDate ? 'is-invalid' : ''}`}
                                   name="publishedDate"
                                   value={formData.publishedDate}
                                   onChange={handleChange}
                                 />
+                                {errors.publishedDate && <div className="invalid-feedback">{errors.publishedDate}</div>}
                               </div>
                             </div>
 
-                            <div className="col-md-4">
+                            <div className="col-md-12">
                               <div className="p-3 rounded shadow" style={{ backgroundColor: "#fff" }}>
-                                <label className="form-label">Moral</label>
-                                <input
-                                  type="text"
-                                  className="form-control"
+                                <label className="form-label">Moral <span className="text-danger">*</span></label>
+                                <textarea
+                                  rows={3}
+                                  className={`form-control ${errors.moral ? 'is-invalid' : ''}`}
                                   name="moral"
                                   value={formData.moral}
                                   onChange={handleChange}
                                   placeholder="Enter Moral"
+                                  required
                                 />
+                                {errors.moral && <div className="invalid-feedback">{errors.moral}</div>}
                               </div>
                             </div>
                           </div>
@@ -657,17 +630,41 @@ const AddBooks = () => {
                       </div>
 
                       <div className="col-12 mt-4 mb-3 text-center">
-                        <button className="btn btn-danger-gradient me-2" onClick={() => { navigate("/books") }} type="button">
+                        <button
+                          className="btn btn-danger-gradient me-2"
+                          type="button"
+                          onClick={() => {
+                            setFormData({
+                              id: generateBookId(),
+                              title: "",
+                              author: "",
+                              isbn: "",
+                              publisher: "",
+                              category: "",
+                              language: "",
+                              availableCopies: "",
+                              totalCopies: "",
+                              floor: "",
+                              shelfCode: "",
+                              status: "",
+                              totalPages: "",
+                              features: "",
+                              volume: "",
+                              createdDate: "",
+                              publishedYear: "",
+                              publishedDate: "",
+                              moral: "",
+                            });
+                          }}
+                        >
                           Cancel
                         </button>
                         <button className="btn btn-purple-gradient" type="submit">
                           Submit
                         </button>
                       </div>
-
                     </div>
                   </form>
-
                 </div>
               </div>
             </div>
