@@ -18,7 +18,7 @@ const HeaderAdmin = () => {
     : notifications.slice(0, 5);
   const navigate = useNavigate();
   const [name, setName] = useState("Guest");
-  const [designation, setDesignation] = useState("");
+  const [username, setUsername] = useState("");
 
   useEffect(() => {
     const storedUser = JSON.parse(
@@ -27,8 +27,8 @@ const HeaderAdmin = () => {
     if (storedUser && storedUser.name) {
       setName(storedUser.name);
     }
-    if (storedUser && storedUser.user_permission) {
-      setDesignation(storedUser.user_permission);
+    if (storedUser && storedUser.username) {
+      setUsername(storedUser.username);
     }
   }, []);
 
@@ -315,7 +315,7 @@ const HeaderAdmin = () => {
                 <div class="dropdown-item text-center border-bottom">
                   <span>{name || "Guest"}</span>
                   <span className="d-block fs-12 text-muted">
-                    {designation || "Designation"}
+                    {username || "Admin"}
                   </span>
                 </div>
               </li>

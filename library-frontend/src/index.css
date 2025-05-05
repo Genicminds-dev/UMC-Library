@@ -27,10 +27,7 @@
   border: 0;
 }
 .login-rightside h3{text-shadow: 1px 2px 2px #333;}
-.login-rightside img {
-  border: 5px solid #fff;
-  border-radius: 37px;
-}
+
 .bg-white p a{color: #333 !important;}
 .glightbox.card {
   border: 1px solid #ccc;
