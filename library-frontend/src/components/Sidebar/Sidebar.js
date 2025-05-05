@@ -329,7 +329,7 @@ const Sidebar = ({ user }) => {
                                   </span>
                                 </Link>
                               </li>
-                              <li class="slide">
+                              {/* <li class="slide">
                                 <Link
                                   to="/add-new-entry"
                                   className={`side-menu__item ${location.pathname === "/add-new-entry" ? "active-box" : ""}`}
@@ -603,11 +603,11 @@ const Sidebar = ({ user }) => {
                                     </li>
                                   </ul>
                                 )}
-                              </li>
+                              </li> */}
                               <li class="slide">
                                 <Link
-                                  to="/add-user"
-                                  class="side-menu__item"
+                                  to="/users"
+                                  className={`side-menu__item ${location.pathname === "/users" ? "active-box" : ""}`}
                                   onClick={() => handleSidebarItemClick()}
                                 >
                                   <svg
@@ -624,7 +624,7 @@ const Sidebar = ({ user }) => {
                                       d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
                                     ></path>
                                   </svg>
-                                  <span class="side-menu__label">User</span>
+                                  <span className={`side-menu__label ${location.pathname === "/users" ? "active" : ""}`}>Users</span>
                                 </Link>
                               </li>
                             </>

@@ -11642,7 +11642,7 @@ caption {
   justify-content: center;
   position: relative;
   /* background: linear-gradient(70deg, #FF4E4E 0%, #FFF279 100%); */
-  background-color: #465fff;
+  background-color: #161950;
 }
 .authentication .authentication-cover:before {
   position: absolute;
@@ -25486,10 +25486,6 @@ a.link-underline-dark {
     border: 0;
 }
 
-.login-rightside img {
-  border: 5px solid #fff;
-  border-radius: 37px;
-}
 .login-rightside h3 {
   text-shadow: 1px 2px 2px #333;
 }

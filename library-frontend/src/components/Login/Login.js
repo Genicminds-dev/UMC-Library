@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import api, { baseURLImage } from "../../api";
+import api from "../../api";
 import {
   RiUserLine,
   RiEyeOffLine,
@@ -8,6 +8,7 @@ import {
   RiLockLine,
 } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
+import image from "../../assets/images/bg-watermark.png";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -18,37 +19,13 @@ const Login = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const [loginError, setLoginError] = useState(""); // NEW
   const [showPassword, setShowPassword] = useState(false);
   const [inputStyles, setInputStyles] = useState({
     username: "form-control",
     password: "form-control",
   });
   const [user, setUser] = useState(null);
-  const [profile, setProfile] = useState([]);
-  const [form, setForm] = useState([]);
-
-  const fetchProfile = async () => {
-    try {
-      const response = await api.get("/login-profile");
-      setProfile(response.data);
-    } catch (error) {
-      console.error("Error fetching login profile data ", error);
-    }
-  };
-
-  const fetchForm = async () => {
-    try {
-      const response = await api.get("/login-form");
-      setForm(response.data);
-    } catch (error) {
-      console.error("Error fetching login form data ", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchProfile();
-    fetchForm();
-  }, []);
 
   const handleChange = (e) => {
     setData({
@@ -56,6 +33,7 @@ const Login = () => {
       [e.target.name]: e.target.value,
     });
     setErrors({ ...errors, [e.target.name]: "" });
+    setLoginError(""); // Clear general login error on input change
 
     if (e.target.name === "username") {
       setInputStyles({
@@ -85,20 +63,15 @@ const Login = () => {
     }
 
     try {
-      // Make the login request
       const response = await api.post("/login", userData);
+      const { username, name, role } = response.data.user;
 
-      // Extract user data from the response
-      const { username, name, user_permission } = response.data.user;
-
-      // Set values in localStorage
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem(
         "user",
-        JSON.stringify({ username, name, user_permission })
+        JSON.stringify({ username, name, role })
       );
 
-      // Show success notification and navigate to the dashboard
       Swal.fire({
         icon: "success",
         title: "Success!",
@@ -110,11 +83,9 @@ const Login = () => {
         navigate("/dashboard");
       });
     } catch (err) {
-      // Show error message on failure
-      alert(err.response?.data?.msg || "An error occurred during login");
+      setLoginError(err.response?.data?.message || "Invalid username or password");
     }
   };
-
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -136,49 +107,64 @@ const Login = () => {
     <div className="landing-body">
       <div className="row authentication authentication-cover-main mx-0">
 
-        <div className="col-xxl-6 col-xl-5 col-lg-12 d-xl-block d-none px-0 text-center">
-          <div className="authentication-cover overflow-hidden">
-            <div className="aunthentication-cover-content d-flex align-items-center justify-content-center">
-              <div className="login-rightside">
-                <img
-                  className="mb-4"
-                  src={`${baseURLImage}${profile[0]?.image_path}`}
-                  alt="praniti-photo"
-                />
-                <h3 className="text-fixed-white mb-3 fw-medium">
-                  {profile[0]?.name}
-                </h3>
-                <h5 className="text-fixed-white mb-1">
-                  {profile[0]?.designation}
-                </h5>
-              </div>
+        {/* Left Pane with Watermark */}
+        <div className="col-xxl-6 col-xl-5 col-lg-12 d-xl-block d-none px-0 position-relative">
+          <div
+            className="d-flex align-items-center justify-content-center text-center"
+            style={{
+              backgroundColor: "#161950",
+              height: "100vh",
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            <img
+              src={image}
+              alt="UMC Logo"
+              className="w-100 h-100"
+              style={{
+                position: "absolute",
+                objectFit: "contain",
+                opacity: 0.2,
+                zIndex: 1,
+              }}
+            />
+            <div className="position-relative z-2 px-4">
+              <h2 className="fw-bold text-white mb-3" style={{ fontSize: "1.85rem" }}>
+                UMC Library Management <br /> System
+              </h2>
+              <p className="mb-1 fs-6" style={{ color: "#d0d5dd" }}>
+                Digital Initiative by Ulhasnagar Municipal Corporation
+              </p>
+              <p className="fs-6" style={{ color: "#d0d5dd" }}>
+                Transforming library services for citizens
+              </p>
             </div>
           </div>
         </div>
 
+        {/* Login Form */}
         <div className="col-xxl-6 col-xl-7">
           <div className="row justify-content-center align-items-center h-100">
             <div className="col-xxl-7 col-xl-9 col-lg-6 col-md-6 col-sm-8 col-12">
-              <div className="card custom-card my-auto border">
+              <div className="card custom-card my-auto border shadow-lg">
                 <div className="card-body p-5">
-                  {/* <div className="d-flex mb-3 justify-content-between gap-2 flex-wrap flex-lg-nowrap">
-                    <button className="btn btn-lg btn-light-ghost d-flex align-items-center justify-content-center flex-fill">
-                      <img
-                        width="120"
-                        src={`${baseURLImage}${form[0]?.image_path}`}
-                        alt="congress-logo"
-                      />
-                    </button>
-                  </div> */}
                   <h5 className="text-dark mb-1 text-center fw-medium mb-3">
-                    Welcome to {form[0]?.title}
+                    Welcome to Library Management System
                   </h5>
                   <p className="h4 mb-2 text-center text-danger">LOGIN</p>
-                  <p className="mb-4 text-dark op-9 fw-normal text-center">
-                    Please enter your details to Sign In
+                  <p className="mb-4 text-muted op-9 fw-normal text-center">
+                    Please enter your details to sign in!
                   </p>
+
                   <form onSubmit={onSubmit}>
                     <div className="row gy-3">
+                      {loginError && (
+                        <div className="text-danger text-center mb-2">
+                          {loginError}
+                        </div>
+                      )}
+
                       <div className="col-xl-12 mb-2">
                         <div className="mb-3">
                           <label className="form-label fs-14 text-dark">
@@ -255,7 +241,7 @@ const Login = () => {
                         <div className="d-grid gap-2 col-6 mx-auto">
                           <button
                             type="submit"
-                            className="btn btn-primary01-gradient text-center"
+                            className="btn btn-secondary-gradient text-center"
                           >
                             LOGIN
                           </button>
@@ -263,12 +249,13 @@ const Login = () => {
                       </div>
                     </div>
                   </form>
+
                 </div>
               </div>
             </div>
           </div>
         </div>
-
+        
       </div>
     </div>
   );
