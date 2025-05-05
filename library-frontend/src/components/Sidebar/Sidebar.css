@@ -48,7 +48,7 @@
   align-items: center;
   gap: 0.5rem;
   color: #344054;
-  background-color: transparent;
+  /* background-color: transparent; */
   border: none;
   padding: 0.5rem 0.75rem;
   border-radius: 0.5rem;
@@ -61,6 +61,7 @@
   background-color: #eef2ff; 
   border-radius: 8px;
 }
+
 
 /* Menu label default */
 .main-menu .slide .side-menu__label {

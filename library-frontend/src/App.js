@@ -11,6 +11,9 @@ import Sidebar from './components/Sidebar/Sidebar';
 import LendedBooks from './components/LendedBooks/LendedBooks';
 import StudentList from './components/StudentList/StudentList';
 import AddStudents from './components/StudentList/AddStudents';
+import StudentDetail from './components/StudentList/StudentsDetail';
+import EditStudent from './components/StudentList/EditStudents';
+import QrDetailsPage from './components/StudentList/QrDetailsPage';
 import Users from './components/Users/Users';
 import AddUser from "./components/Users/AddUsers";
 import FooterAdmin from './components/FooterAdmin/FooterAdmin';
@@ -35,6 +38,8 @@ function Layout({ children }) {
     '/students',
     '/add-students',
     '/lended-books',
+    '/student/:id',
+    '/edit-student/:id',
     '/users',
     '/add-users',
   ];
@@ -43,35 +48,27 @@ function Layout({ children }) {
     role === 'Clerk' ? clerkRoutes : adminRoutes;
 
   const path = location.pathname;
-  const isEditOrViewApplication =
-    path.startsWith('/edit-application/') ||
-    path.startsWith('/view-application/');
 
   const isProtected = protectedRoutes.some((route) =>
     path.startsWith(route.split('/:')[0])
   );
 
-  // Redirect to login if accessing protected route
   if (!isLoggedIn && isProtected) {
     return <Navigate to="/login" />;
   }
 
-  // Redirect to dashboard if logged in and trying to access login
   if (isLoggedIn && (path === '/' || path === '/login')) {
     return <Navigate to="/dashboard" />;
   }
 
-  // Redirect to dashboard if logged in and trying to access invalid route
   if (isLoggedIn && !isProtected && path !== '/login') {
     return <Navigate to="/dashboard" />;
   }
 
-  // Show only login page layout
   if (!isLoggedIn && (path === '/' || path === '/login')) {
     return <>{children}</>;
   }
 
-  // Protected layout
   return (
     <>
       <HeaderAdmin />
@@ -94,9 +91,17 @@ function Layout({ children }) {
 function App() {
   return (
     <Router>
-      <Layout>
-        <Routes>
-          <Route index element={<Login />} />
+      <Routes>
+        {/* Plain route with no layout */}
+        <Route path="/qr-details/:id" element={<QrDetailsPage />} />
+
+        {/* All other routes wrapped with Layout */}
+        <Route
+          path="*"
+          element={
+            <Layout>
+              <Routes>
+           <Route index element={<Login />} />
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/books" element={<BookList />} />
@@ -106,8 +111,13 @@ function App() {
           <Route path="/lended-books" element={<LendedBooks />} />
           <Route path="/users" element={<Users />} />
           <Route path="/add-users" element={<AddUser />} />
-        </Routes>
-      </Layout>
+                <Route path="/student/:id" element={<StudentDetail />} />
+                <Route path="/edit-student/:id" element={<EditStudent />} />
+              </Routes>
+            </Layout>
+          }
+        />
+      </Routes>
     </Router>
   );
 }

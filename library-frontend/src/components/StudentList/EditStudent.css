@@ -1,0 +1,211 @@
+/* Header Styles */
+#edit-content .edit-student-header {
+    background: linear-gradient(to right, #6a5af9 0%, #a034f8 100%);
+    color: white;
+    padding: 15px 20px;
+    border-bottom: none;
+    border-radius: 10px 10px 0 0;
+  }
+  
+  #edit-content .edit-student-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  #edit-content .edit-student-name {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 0;
+    color: #fff;
+  }
+  
+  #edit-content .edit-student-id {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-bottom: 0;
+  }
+  
+  /* Section Styles */
+  #edit-content .section-icon-container {
+    background-color: #fff;
+    padding: 6px 10px;
+    border-radius: 8px;
+    display: inline-block;
+    font-size: 16px;
+  }
+  
+  #edit-content .section-title {
+    font-weight: 600;
+    color: #344054;
+    margin-bottom: 0;
+    font-size: 14px;
+  }
+  
+  /* Form Field Container */
+  #edit-content .form-field-container {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #f0f0f0;
+  }
+  
+  #edit-content .form-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #64748b;
+    margin-bottom: 5px;
+    display: block;
+  }
+  
+  /* Section Backgrounds */
+  #edit-content .personal-details-section {
+    background-color: #e6f2ff;
+    padding: 20px;
+    border-radius: 8px;
+  }
+  
+  #edit-content .education-details-section {
+    background-color: #e6ffed;
+    padding: 20px;
+    border-radius: 8px;
+  }
+  
+  #edit-content .upload-documents-section {
+    background-color: #fff0f3;
+    padding: 20px;
+    border-radius: 8px;
+  }
+  
+  #edit-content .parent-details-section {
+    background-color: #f0e6ff;
+    padding: 20px;
+    border-radius: 8px;
+  }
+  
+  #edit-content .address-details-section {
+    background-color: #ffe6e6;
+    padding: 20px;
+    border-radius: 8px;
+  }
+  
+  /* Upload Area Styles */
+  #edit-content .upload-area {
+    display: block;
+    border: 2px dashed #dee2e6;
+    border-radius: 6px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  #edit-content .upload-area:hover {
+    border-color: #6a5af9;
+  }
+  
+  #edit-content .upload-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  #edit-content .passport-preview {
+    height: 120px;
+    width: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+  
+  #edit-content .aadhar-preview {
+    height: 120px;
+    width: 100%;
+    object-fit: contain;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+  
+  #edit-content .upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  #edit-content .upload-icon {
+    width: 40px;
+    height: 40px;
+    background-color: #e9ecef;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+  
+  #edit-content .upload-text {
+    font-size: 14px;
+    color: #6c757d;
+    margin-bottom: 5px;
+  }
+  
+  #edit-content .upload-hint {
+    font-size: 12px;
+    color: #adb5bd;
+  }
+  
+  #edit-content .upload-change-text {
+    font-size: 12px;
+    color: #6a5af9;
+  }
+  
+  /* Icon Colors */
+  #edit-content .text-indigo {
+    color: #6a5af9;
+  }
+  
+  #edit-content .text-blue {
+    color: #3b7ddd;
+  }
+  
+  #edit-content .text-purple {
+    color: #8a63d2;
+  }
+  
+  #edit-content .text-pink {
+    color: #e83e8c;
+  }
+  
+  /* Custom Card */
+  #edit-content .custom-card {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e9ecef;
+  }
+  
+  /* Button Styles */
+  #edit-content .btn-primary {
+    background-color: #6a5af9;
+    border-color: #6a5af9;
+  }
+  
+  #edit-content .btn-primary:hover {
+    background-color: #5a4ad9;
+    border-color: #5a4ad9;
+  }
+  
+  #edit-content .btn-danger {
+    background-color: #f5365c;
+    border-color: #f5365c;
+  }
+  
+  #edit-content .btn-danger:hover {
+    background-color: #e5254c;
+    border-color: #e5254c;
+  }
